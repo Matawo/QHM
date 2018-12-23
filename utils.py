@@ -9,19 +9,26 @@ def run(qhm, nb_sc, nb_step):  # Lance un run sur qhm, de nb_sc secondes, de nb_
     time_rotation = 0
     time_interaction = 0
     time_shift = 0
+    time_creation = 0
     total_time = 0
     start = time.time()
     print("\n____________________________")
     print(qhm)
     print("Rotation :\n", qhm.rotationOp)
+    print("Creation :\n", qhm.creation_op)
     print("Interaction :\n", qhm.interactionOp)
     data = []
     n = 0
     while time.time() - start< nb_sc and n < nb_step:
-        # Etape de rotation, exemple : Ur |--L--> = a |--L--> + b |--R-->
+        print(n,time.time() - start)
+        # Etape de rotation Ur |--L--> = a |--L--> + b |--R-->
         time_rotation -= time.time()
         qhm.update_dict(qhm.rotation_step())
         time_rotation += time.time()
+        # Etape de creation Ur |--O--> = a |--LR--> + b |--O-->
+        time_creation -= time.time()
+        qhm.update_dict(qhm.creation_destruction_step())
+        time_creation += time.time()
         # Etape de shift, exemple :|-L--O-> = |--O--L--> (pour l'instant il n'y a que l'identité)
         time_shift -= time.time()
         qhm.update_dict(qhm.shifting_step())
@@ -35,6 +42,7 @@ def run(qhm, nb_sc, nb_step):  # Lance un run sur qhm, de nb_sc secondes, de nb_
         n += 1
     total_time = time.time() - start
     print("rotation :", time_rotation, "sc ", time_rotation / total_time * 100, "%")
+    print("creation/destruction :", time_creation, "sc ", time_rotation / total_time * 100, "%")
     print("interaction :", time_interaction, "sc ", time_interaction / total_time * 100, "%")
     print("shift :", time_shift, "sc ", time_shift / total_time * 100, "%")
     print("Nombres d'étapes, nombres de graphes", n, qhm.number_of_graphs())
@@ -60,8 +68,9 @@ gmn3 = GraphModuloName(4, ((True, True), (True, True), (True, False), (False, Tr
 # Pseudo oscillation observable à 200 étapes
 
 # Paires d'opérateurs à intéressant à étudier
-ops1 = (identity, hadamard)
-ops2 = (identity, unitary1)
-ops3 = (identity, unitary2)
-ops4 = (unitary1, pauli_x)
-ops5 = (unitary1, hadamard)
+ops1 = (identity, hadamard, identity)
+ops2 = (identity, unitary1, identity)
+ops3 = (identity, unitary2, identity)
+ops4 = (unitary1, pauli_x, identity)
+ops5 = (unitary1, hadamard, identity)
+ops6 = (identity, pauli_x, unitary1)

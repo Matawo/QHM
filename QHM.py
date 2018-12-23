@@ -30,10 +30,11 @@ class QHM:
 
     error_margin = 10**(-9)
 
-    def __init__(self, superposition, rotation_op, interaction_op):
+    def __init__(self, superposition, rotation_op, interaction_op, creation_op):
         self.superposition = superposition
         self.interactionOp = interaction_op
         self.rotationOp = rotation_op
+        self.creation_op = creation_op
 
     def __str__(self):
         string = ""
@@ -68,21 +69,25 @@ class QHM:
             new_dict[GraphModuloName(gmn.size, new_gmn_array)] = name_set
         return new_dict
 
-    # def shifting_step(self):  # Inutile
-    #     new_dict = dict()
-    #     for gmn, name_set in self.superposition.items():
-    #         new_gmn_array = gmn.shifting()
-    #         offset, new_gmn_array = lexico_order(new_gmn_array)
-    #         new_name_set = NameSet(name_set.amps, name_set.name_table)
-    #         new_name_set.offset(offset)
-    #         new_gmn = GraphModuloName(gmn.size, new_gmn_array)
-    #         new_dict[gmn.shifting()] = name_set.offset(offset)
-    #     return new_dict
-
     def rotation_step(self):
         new_dict = dict()
         for gmn, name_set in self.superposition.items():  # Pour chaque graphe de la superposition
             for new_gmn_array, value in gmn.rotation(self.rotationOp).items():
+                offset, new_gmn_array = lexico_order(new_gmn_array)
+                new_gmn = GraphModuloName(gmn.size, new_gmn_array)
+                new_name_set = name_set.multiply_amps(value)
+                new_name_set.symmetry = new_gmn.symmetry
+                new_name_set = new_name_set.offset(offset)
+                old_name_set = new_dict.get(new_gmn, NameSet(dict()))
+                new_name_set.add_all(old_name_set)
+                new_dict[new_gmn] = new_name_set
+        QHM.clean_up(new_dict)
+        return new_dict
+
+    def creation_destruction_step(self):
+        new_dict = dict()
+        for gmn, name_set in self.superposition.items():  # Pour chaque graphe de la superposition
+            for new_gmn_array, value in gmn.creation_destruction(self.creation_op).items():
                 offset, new_gmn_array = lexico_order(new_gmn_array)
                 new_gmn = GraphModuloName(gmn.size, new_gmn_array)
                 new_name_set = name_set.multiply_amps(value)
@@ -126,7 +131,7 @@ class QHM:
         return sum([len(name_set.map) for name_set in self.superposition.values()])
 
     def minus(self, other):
-        result = QHM(copy.deepcopy(self.superposition), self.rotationOp, self.interactionOp)
+        result = QHM(copy.deepcopy(self.superposition), self.rotationOp, self.interactionOp, self.creation_op)
         for gmn, name_set in other.superposition.items():
             other_name_set = name_set.multiply_amps(-1)
             result_name_set = result.superposition.get(gmn, NameSet(dict()))

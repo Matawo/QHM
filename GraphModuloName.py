@@ -87,6 +87,26 @@ class GraphModuloName:
             map_temp1 = map_temp2
         return map_temp1
 
+    def creation_destruction(self, creation_op):
+        map_temp1 = {self.graph: 1.}
+        for i in range(self.size):
+            map_temp2 = {}
+            for particles, value in map_temp1.items():
+                # Calcul de l'évolution du graphe en position i
+                new_particles = list(particles)
+                new_particles[i] = (not particles[i][0], not particles[i][1])
+                new_particles = tuple(new_particles)
+                if particles[i] == (True, True):
+                    map_temp2.update({particles: value * creation_op.item(0, 0)})
+                    map_temp2.update({new_particles: value * creation_op.item(0, 1)})
+                elif particles[i] == (False, False):
+                    map_temp2.update({new_particles: value * creation_op.item(1, 0)})
+                    map_temp2.update({particles: value * creation_op.item(1, 1)})
+                else:
+                    map_temp2.update({particles: value})
+            map_temp1 = map_temp2
+        return map_temp1
+
     def interaction(self, interaction_op):  # Interaction sur un vecteur de la base canonique #
         map_temp1 = {(): (1, ())}
         # print("_________________\n", graph_o)

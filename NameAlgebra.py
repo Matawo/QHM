@@ -13,9 +13,9 @@ class SimpleName:  # Class of simple name, i.e atomic name with a path in the bi
         tree_string = ""
         for i in self.tree:
             if i:
-                i += "l"
+                tree_string += "l"
             else:
-                i += "r"
+                tree_string += "r"
         return str(self.atomic) + '.' + tree_string
 
     def __repr__(self):
