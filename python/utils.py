@@ -1,5 +1,5 @@
 from scipy import linalg
-from QHM import *
+from python.QHM import *
 import numpy as np
 from math import *
 import time
