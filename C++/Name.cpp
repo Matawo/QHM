@@ -31,7 +31,15 @@ string SimpleName::to_string() {
 }
 
 bool SimpleName::is_brother(Name *other) {
-    return false;
+    auto other_ptr = dynamic_cast<SimpleName*>(other);
+    if (other_ptr == nullptr or this->t.empty()) {
+        return false;
+    } else {
+        for(unsigned long i = 0; i < this->t.size() -1; i++) {
+            if (this->t.at(i) != other_ptr->t.at(i)) { return false;}
+        }
+    }
+    return true;
 }
 
 SimpleName* SimpleName::get_son(bool right_or_left) {
@@ -48,6 +56,11 @@ Name* SimpleName::get_left() {
 Name* SimpleName::get_right() {
     return this->get_son(RIGHT);
 }
+
+Name *SimpleName::normalize() {
+    return this;
+}
+
 ComposedName::ComposedName(Name *left, Name *right) : left(left), right(right) {}
 
 size_t ComposedName::hash() {
@@ -72,4 +85,13 @@ Name *ComposedName::get_left() {
 
 Name *ComposedName::get_right() {
     return right;
+}
+
+Name *ComposedName::normalize() {
+    auto left_cn = dynamic_cast<SimpleName*>(left);
+    if (left_cn == nullptr || !left_cn->is_brother(this->right)) { return this;}
+    vector<bool> new_vector = vector<bool>(left_cn->t);
+    new_vector.pop_back();
+    auto new_addr = new SimpleName(left_cn->value, new_vector);
+    return new_addr;
 }

@@ -15,10 +15,15 @@ public :
     virtual std::string to_string() = 0;
     virtual Name* get_left() = 0;
     virtual Name* get_right() = 0;
+    virtual Name* normalize() = 0;
 };
 
 class SimpleName: public Name {
 public:
+    std::vector<bool> t;
+
+    int value;
+
     SimpleName(int value, const vector<bool> &t);
 
     size_t hash() override;
@@ -33,11 +38,12 @@ public:
 
     Name *get_right() override;
 
+    Name *normalize() override;
+
+
 private:
-    //True = right, false =
+    //True = right, false = left
     SimpleName*  get_son(bool);
-    std::vector<bool> t;
-    int value;
 };
 
 
@@ -54,6 +60,8 @@ public:
     Name *get_left() override;
 
     Name *get_right() override;
+
+    Name *normalize() override;
 
 private:
     Name *left;
