@@ -17,11 +17,7 @@ public:
 
     Graph * shift();
 
-    set<Graph*> ne
-
     string to_string();
-
-    unsigned
 
 private:
     std::vector<bool> particles;
