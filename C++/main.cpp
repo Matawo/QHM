@@ -1,21 +1,25 @@
 #include <iostream>
 #include "Name.h"
 #include "Name.cpp"
+#include "Graph.h"
 
 int main(){
+    SimpleName n1 = SimpleName(1,{});
+    SimpleName n2 = SimpleName(2,{});
+    SimpleName n3 = SimpleName(3,{});
     SimpleName a = SimpleName(12,{true, false, true, false});
     SimpleName b = SimpleName(12, {true, false, true, true});
     ComposedName c = ComposedName(&a,&b);
     ComposedName d = ComposedName(&c,&b);
     Name* left = d.get_left();
     Name* right = d.get_right();
-    std::cout<<a.to_string()<<std::endl;
-    std::cout<<b.to_string()<<std::endl;
-    std::cout<<c.to_string()<<std::endl;
-    std::cout<<c.normalize()->to_string()<<std::endl;
-    std::cout<<d.to_string()<<std::endl;
-    std::cout<<left->to_string()<<std::endl;
-    std::cout<<right->to_string()<<std::endl;
-    std::cout<<a.is_brother(&b)<<std::endl;
+    Name** names = new Name*[3];
+    names[0] = &n1;
+    names[1] = &n2;
+    names[2] = &n3;
+    vector<bool> particles = {true,false,true, true,false,false};
+    auto test = Graph(3, std::complex<double>(1.0, 0.0), particles , names);
+    std::cout << test.to_string() << "\n";
+    std::cout << test.shift()->to_string();
     return 0;
 }

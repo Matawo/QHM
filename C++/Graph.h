@@ -8,17 +8,26 @@
 #include <vector>
 #include "Name.h"
 #include <complex>
+#include <set>
+#include <string>
 
 class Graph {
 public:
-    Graph(const vector<bool> &particles, Name **names);
+    Graph(unsigned int size,complex<double> amp, vector<bool> &particles, Name **names);
 
-    State* shift(std::complex<double> * unitary, std::complex<double> amp);
+    Graph * shift();
+
+    set<Graph*> ne
+
+    string to_string();
+
+    unsigned
 
 private:
     std::vector<bool> particles;
     Name** names;
-
+    complex<double> amp;
+    unsigned int size;
 };
 
 

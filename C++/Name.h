@@ -1,5 +1,5 @@
 //
-// Created by matawo on 22/03/19.
+// Created by Nicolas Durbec on 22/03/19.
 //
 #include <vector>
 #include <string>

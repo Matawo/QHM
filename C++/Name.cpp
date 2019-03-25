@@ -1,5 +1,5 @@
 //
-// Created by matawo on 22/03/19.
+// Created by Nicolas Durbec on 22/03/19.
 //
 #include <stdlib.h>
 #include "Name.h"
@@ -14,7 +14,9 @@
 SimpleName::SimpleName(int value, const vector<bool> &t) : value(value), t(t) {}
 
 size_t SimpleName::hash() {
-    return 0;
+    auto h1 = (size_t) value;
+    auto h2 = std::hash<vector<bool>>{}(t);
+    return h1 ^ (h2 << 1);
 }
 
 bool SimpleName::equals(Name *n) {
