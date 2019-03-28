@@ -10,6 +10,7 @@
 #include <complex>
 #include <set>
 #include <string>
+#include <unordered_set>
 
 class Graph {
 public:
@@ -17,13 +18,20 @@ public:
 
     Graph * shift();
 
+    unordered_set<Graph> * interaction(complex<double> * unitary);
+
     string to_string();
 
+    bool operator==(const Graph &rhs) const;
+
+    bool operator!=(const Graph &rhs) const;
+
+
 private:
+    unsigned int size;
+    complex<double> amp;
     std::vector<bool> particles;
     Name** names;
-    complex<double> amp;
-    unsigned int size;
 };
 
 

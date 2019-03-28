@@ -3,7 +3,7 @@
 //
 
 #include "Graph.h"
-#include <set>
+#include <unordered_set>
 #include <iostream>
 
 Graph::Graph(unsigned int size,complex<double> amp, vector<bool> &particles, Name **names) : particles(
@@ -29,6 +29,7 @@ string Graph::to_string() {
 
 }
 
+//Même pointeurs de noms,
 Graph * Graph::shift() {
     vector<bool> p(2*size,false);
     for(int i=0; i<size;i++) {
@@ -37,4 +38,38 @@ Graph * Graph::shift() {
     }
     auto* g_ptr = new Graph(size,amp, p, names);
     return g_ptr;
+}
+
+unordered_set<Graph> *  Graph::interaction(complex<double> * unitary) {
+    auto cur_s = new unordered_set<Graph>();
+    auto new_s = new unordered_set<Graph>();
+    cur_s->insert(this);
+    for(int i=0;i<size;i++){
+        while(!cur_s->empty()) {
+
+        }
+    }
+    return s;
+}
+
+bool Graph::operator<(const Graph &rhs) const {
+    if (size < rhs.size)
+        return true;
+    if (rhs.size < size)
+        return false;
+    if (particles < rhs.particles)
+        return true;
+    if (rhs.particles < particles)
+        return false;
+    return names < rhs.names;
+}
+
+bool Graph::operator==(const Graph &rhs) const {
+    return size == rhs.size &&
+           particles == rhs.particles &&
+           names == rhs.names;
+}
+
+bool Graph::operator!=(const Graph &rhs) const {
+    return !(rhs == *this);
 }
