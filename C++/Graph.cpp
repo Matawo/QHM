@@ -29,12 +29,11 @@ string Graph::to_string() {
 
 }
 
-Graph * Graph::shift() {
+Graph Graph::shift() {
     vector<bool> p(2*size,false);
     for(int i=0; i<size;i++) {
         p[2*i]= this->particles[(2*i+2)%(2*size)];
         p[2*i+1]= this->particles[(2*i-1+2*size)%(2*size)];
     }
-    auto* g_ptr = new Graph(size,amp, p, names);
-    return g_ptr;
+    return Graph(size,amp, p, names);
 }

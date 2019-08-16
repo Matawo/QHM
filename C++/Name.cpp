@@ -97,3 +97,10 @@ Name *ComposedName::normalize() {
     auto new_addr = new SimpleName(left_cn->value, new_vector);
     return new_addr;
 }
+
+ComposedName::~ComposedName() {
+    if (left)
+        delete left;
+    if (right)
+        delete right;
+}

@@ -50,6 +50,7 @@ private:
 class ComposedName: public Name {
 public:
     ComposedName(Name *left, Name *right);
+    ~ComposedName();
 
     size_t hash() override;
 

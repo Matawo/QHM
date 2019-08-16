@@ -15,7 +15,7 @@ class Graph {
 public:
     Graph(unsigned int size,complex<double> amp, vector<bool> &particles, Name **names);
 
-    Graph * shift();
+    Graph shift();
 
     string to_string();
 
