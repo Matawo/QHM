@@ -13,11 +13,14 @@
 
 class Graph {
 public:
-    Graph(unsigned int size,complex<double> amp, vector<bool> &particles, Name **names);
+    Graph(unsigned int size,complex<double> amp, vector<bool> particles, Name **names);
+    ~Graph();
 
-    Graph shift();
+    Graph* shift();
 
     string to_string();
+
+    Name** names_copy();
 
 private:
     std::vector<bool> particles;

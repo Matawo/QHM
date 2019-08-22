@@ -11,7 +11,7 @@
 #define RIGHT true
 #define LEFT false
 
-SimpleName::SimpleName(int value, const vector<bool> &t) : value(value), t(t) {}
+SimpleName::SimpleName(int value,const vector<bool> &t) : value(value), t(t) {}
 
 size_t SimpleName::hash() {
     auto h1 = (size_t) value;
@@ -59,9 +59,16 @@ Name* SimpleName::get_right() {
     return this->get_son(RIGHT);
 }
 
-Name *SimpleName::normalize() {
+Name* SimpleName::normalize() {
     return this;
 }
+
+Name* SimpleName::deep_copy() {
+    auto * s = new SimpleName(value, t);
+    return s;
+}
+
+SimpleName::~SimpleName() = default;
 
 ComposedName::ComposedName(Name *left, Name *right) : left(left), right(right) {}
 
@@ -103,4 +110,8 @@ ComposedName::~ComposedName() {
         delete left;
     if (right)
         delete right;
+}
+
+Name *ComposedName::deep_copy() {
+    return new ComposedName(left->deep_copy(), right->deep_copy());
 }

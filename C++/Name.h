@@ -10,12 +10,14 @@ using namespace std;
 
 class Name {
 public :
+    virtual ~Name() {};
     virtual size_t hash() = 0;
     virtual bool equals(Name* n) = 0;
     virtual std::string to_string() = 0;
     virtual Name* get_left() = 0;
     virtual Name* get_right() = 0;
     virtual Name* normalize() = 0;
+    virtual Name*  deep_copy() = 0;
 };
 
 class SimpleName: public Name {
@@ -25,6 +27,7 @@ public:
     int value;
 
     SimpleName(int value, const vector<bool> &t);
+    ~SimpleName() override;
 
     size_t hash() override;
 
@@ -40,6 +43,9 @@ public:
 
     Name *normalize() override;
 
+    Name *deep_copy() override;
+
+
 
 private:
     //True = right, false = left
@@ -50,7 +56,7 @@ private:
 class ComposedName: public Name {
 public:
     ComposedName(Name *left, Name *right);
-    ~ComposedName();
+    ~ComposedName() override;
 
     size_t hash() override;
 
@@ -63,6 +69,8 @@ public:
     Name *get_right() override;
 
     Name *normalize() override;
+
+    Name *deep_copy() override;
 
 private:
     Name *left;

@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/qhm.dir/main.cpp.o CMakeFiles/qhm.dir/Graph.cpp.o  -o qhm 
