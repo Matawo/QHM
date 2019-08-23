@@ -10,7 +10,7 @@ using namespace std;
 
 class Name {
 public :
-    virtual ~Name() {};
+    virtual ~Name() = default;;
     virtual size_t hash() = 0;
     virtual bool equals(Name* n) = 0;
     virtual std::string to_string() = 0;

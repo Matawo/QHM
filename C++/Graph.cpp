@@ -38,18 +38,14 @@ Name** Graph::names_copy() {
     return new_names;
 }
 
-<<<<<<< HEAD
-Graph* Graph::shift() {
-=======
+
 //Même pointeurs de noms,
 Graph * Graph::shift() {
->>>>>>> 369ee1a8aa3d5ca1d9b256a8160d18886029bec4
     vector<bool> p(2*size,false);
     for(int i=0; i<size;i++) {
         p[2*i]= this->particles[(2*i+2)%(2*size)];
         p[2*i+1]= this->particles[(2*i-1+2*size)%(2*size)];
     }
-<<<<<<< HEAD
     return new Graph(size,amp, p, this->names_copy());
 }
 
@@ -60,12 +56,9 @@ Graph::~Graph() {
         }
         delete[] names;
     }
-=======
-    auto* g_ptr = new Graph(size,amp, p, names);
-    return g_ptr;
 }
 
-unordered_set<Graph> *  Graph::interaction(complex<double> * unitary) {
+unordered_set<Graph>* Graph::interaction(complex<double> * unitary) {
     auto cur_s = new unordered_set<Graph>();
     auto new_s = new unordered_set<Graph>();
     cur_s->insert(this);
@@ -74,7 +67,7 @@ unordered_set<Graph> *  Graph::interaction(complex<double> * unitary) {
 
         }
     }
-    return s;
+    return cur_s;
 }
 
 bool Graph::operator<(const Graph &rhs) const {
@@ -97,5 +90,4 @@ bool Graph::operator==(const Graph &rhs) const {
 
 bool Graph::operator!=(const Graph &rhs) const {
     return !(rhs == *this);
->>>>>>> 369ee1a8aa3d5ca1d9b256a8160d18886029bec4
 }

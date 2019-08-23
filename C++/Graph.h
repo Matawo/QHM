@@ -23,14 +23,14 @@ public:
 
     string to_string();
 
-<<<<<<< HEAD
     Name** names_copy();
-=======
+
     bool operator==(const Graph &rhs) const;
 
     bool operator!=(const Graph &rhs) const;
 
->>>>>>> 369ee1a8aa3d5ca1d9b256a8160d18886029bec4
+    bool operator<(const Graph &rhs) const;
+
 
 private:
     unsigned int size;

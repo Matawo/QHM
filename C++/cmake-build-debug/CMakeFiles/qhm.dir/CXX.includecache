@@ -6,6 +6,16 @@
 
 #IncludeRegexTransform: 
 
+/home/matawo/CLionProjects/QHM/C++/Graph.cpp
+utility
+-
+Graph.h
+/home/matawo/CLionProjects/QHM/C++/Graph.h
+unordered_set
+-
+iostream
+-
+
 /home/matawo/CLionProjects/QHM/C++/Graph.h
 vector
 -
@@ -17,19 +27,7 @@ set
 -
 string
 -
-
-/home/matawo/CLionProjects/QHM/C++/Name.cpp
-stdlib.h
--
-Name.h
-/home/matawo/CLionProjects/QHM/C++/Name.h
-iostream
--
-iomanip
--
-vector
--
-string
+unordered_set
 -
 
 /home/matawo/CLionProjects/QHM/C++/Name.h
@@ -37,16 +35,4 @@ vector
 -
 string
 -
-
-/home/matawo/CLionProjects/QHM/C++/main.cpp
-iostream
--
-memory
--
-Name.h
-/home/matawo/CLionProjects/QHM/C++/Name.h
-Name.cpp
-/home/matawo/CLionProjects/QHM/C++/Name.cpp
-Graph.h
-/home/matawo/CLionProjects/QHM/C++/Graph.h
 
