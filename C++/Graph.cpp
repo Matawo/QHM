@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 //
 // Created by Nicolas Durbec on 25/03/19.
 //
@@ -8,8 +10,8 @@
 #include <unordered_set>
 #include <iostream>
 
-Graph::Graph(unsigned int size,complex<double> amp, vector<bool> particles, Name **names) : particles(std::move(
-        particles)), names(names), amp(amp), size(size) {}
+Graph::Graph(unsigned int size,complex<double> amp, vector<bool> particles, vector<Name*> names) : particles(std::move(
+        particles)), names(std::move(names)), amp(amp), size(size) {}
 
 string Graph::to_string() {
     string str;
@@ -30,8 +32,8 @@ string Graph::to_string() {
     return str;
 }
 
-Name** Graph::names_copy() {
-    Name** new_names = new Name*[sizeof(this->names)];
+vector<Name*> Graph::names_copy() {
+    vector<Name*> new_names = std::vector<Name*>(size);
     for(int i = 0; i<size; i++) {
         new_names[i] = names[i]->deep_copy();
     }
@@ -50,25 +52,23 @@ Graph * Graph::shift() {
 }
 
 Graph::~Graph() {
-    if(names) {
-        for(int i=0; i< size; i++) {
-            delete names[i];
-        }
-        delete[] names;
+    for(int i=0; i< size; i++) {
+        delete names[i];
     }
+    names.clear();
 }
 
-unordered_set<Graph>* Graph::interaction(complex<double> * unitary) {
-    auto cur_s = new unordered_set<Graph>();
-    auto new_s = new unordered_set<Graph>();
-    cur_s->insert(this);
-    for(int i=0;i<size;i++){
-        while(!cur_s->empty()) {
-
-        }
-    }
-    return cur_s;
-}
+//unordered_set<Graph>* Graph::interaction(complex<double> * unitary) {
+//    auto cur_s = new unordered_set<Graph>();
+//    auto new_s = new unordered_set<Graph>();
+//    cur_s->insert(this);
+//    for(int i=0;i<size;i++){
+//        while(!cur_s->empty()) {
+//
+//        }
+//    }
+//    return cur_s;
+//}
 
 bool Graph::operator<(const Graph &rhs) const {
     if (size < rhs.size)
