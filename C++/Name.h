@@ -1,5 +1,5 @@
 //
-// Created by matawo on 22/03/19.
+// Created by Nicolas Durbec on 22/03/19.
 //
 #include <vector>
 #include <string>
@@ -10,16 +10,24 @@ using namespace std;
 
 class Name {
 public :
+    virtual ~Name() = default;;
     virtual size_t hash() = 0;
     virtual bool equals(Name* n) = 0;
     virtual std::string to_string() = 0;
     virtual Name* get_left() = 0;
     virtual Name* get_right() = 0;
+    virtual Name* normalize() = 0;
+    virtual Name*  deep_copy() = 0;
 };
 
 class SimpleName: public Name {
 public:
+    std::vector<bool> t;
+
+    int value;
+
     SimpleName(int value, const vector<bool> &t);
+    ~SimpleName() override;
 
     size_t hash() override;
 
@@ -33,17 +41,22 @@ public:
 
     Name *get_right() override;
 
+    Name *normalize() override;
+
+    Name *deep_copy() override;
+
+
+
 private:
-    //True = right, false =
+    //True = right, false = left
     SimpleName*  get_son(bool);
-    std::vector<bool> t;
-    int value;
 };
 
 
 class ComposedName: public Name {
 public:
     ComposedName(Name *left, Name *right);
+    ~ComposedName() override;
 
     size_t hash() override;
 
@@ -54,6 +67,10 @@ public:
     Name *get_left() override;
 
     Name *get_right() override;
+
+    Name *normalize() override;
+
+    Name *deep_copy() override;
 
 private:
     Name *left;

@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/matawo/CLionProjects/QHM/C++/Graph.cpp
+utility
+-
+Graph.h
+/home/matawo/CLionProjects/QHM/C++/Graph.h
+unordered_set
+-
+iostream
+-
+
+/home/matawo/CLionProjects/QHM/C++/Graph.h
+vector
+-
+Name.h
+/home/matawo/CLionProjects/QHM/C++/Name.h
+complex
+-
+set
+-
+string
+-
+unordered_set
+-
+
+/home/matawo/CLionProjects/QHM/C++/Name.h
+vector
+-
+string
+-
+

@@ -1,0 +1,3 @@
+/home/matawo/CLionProjects/QHM/C++/build/CMakeFiles/rebuild_cache.dir
+/home/matawo/CLionProjects/QHM/C++/build/CMakeFiles/qhm.dir
+/home/matawo/CLionProjects/QHM/C++/build/CMakeFiles/edit_cache.dir
