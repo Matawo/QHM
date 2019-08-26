@@ -5,7 +5,8 @@
 #include "Graph.h"
 
 int main(){
-    SimpleName* n1 = new SimpleName(1,{true});
+    //WARNING : dans la version actuelle, le premier nom doit contenir l'ancre default = 1.lll... (l==false)
+    SimpleName* n1 = new SimpleName(1,{false});
     SimpleName* n2 = new SimpleName(2,{});
     SimpleName* n3 = new SimpleName(3,{});
     const std::complex<double> hadamard[4] = {std::complex<double>(1/sqrt(2),0.0),std::complex<double>(1/sqrt(2),0.0),

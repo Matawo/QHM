@@ -18,6 +18,7 @@ public :
     virtual Name* get_right_copy() = 0;
     virtual Name* normalize() = 0;
     virtual Name*  deep_copy() = 0;
+    virtual bool contain_anchor(int i) = 0;
 };
 
 class SimpleName: public Name {
@@ -45,6 +46,8 @@ public:
 
     Name *deep_copy() override;
 
+    bool contain_anchor(int i) override;
+
 
 
 private:
@@ -71,6 +74,9 @@ public:
     Name *normalize() override;
 
     Name *deep_copy() override;
+
+    bool contain_anchor(int i) override;
+
 
 private:
     Name *left;

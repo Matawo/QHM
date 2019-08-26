@@ -44,6 +44,10 @@ bool SimpleName::is_brother(Name *other) {
     return true;
 }
 
+bool SimpleName::contains_anchor(int anchor){
+
+}
+
 SimpleName* SimpleName::get_son(bool right_or_left) {
     vector<bool> new_vector = std::move(this->t);
     new_vector.push_back(right_or_left);
@@ -66,6 +70,18 @@ Name* SimpleName::normalize() {
 Name* SimpleName::deep_copy() {
     auto * s = new SimpleName(value, t);
     return s;
+}
+
+bool SimpleName::contain_anchor(int i) {
+    if (value != i) {
+        return false;
+    }
+    for (auto &&it : t) {
+        if(it) {
+            return false;
+        }
+    }
+    return true;
 }
 
 SimpleName::~SimpleName() = default;
@@ -114,4 +130,8 @@ ComposedName::~ComposedName() {
 
 Name *ComposedName::deep_copy() {
     return new ComposedName(left->deep_copy(), right->deep_copy());
+}
+
+bool ComposedName::contain_anchor(int i) {
+    return left->contain_anchor(i) or right->contain_anchor(i);
 }

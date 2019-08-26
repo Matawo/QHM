@@ -83,9 +83,10 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
     std::vector<Graph*> new_s;
     cur_s.push_back(new Graph(0,amp,{},{}));
     int i = 0;
-    while (i < size-1) { //On parcourt les noeuds un à un, le cas du noeud final est géré séparemment
+    while (i < size) { //On parcourt les noeuds un à un, le cas du noeud final est géré séparemment
         cout << "i = " << i << "\n";
         int merge = false;
+        Name* name_to_add_end; //Cas ou le split a lieu en début
         while(!cur_s.empty()) {
             auto* inert_graph = cur_s.back();
 //            cout << "check " << inert_graph << "check cur_s\n";
@@ -95,18 +96,23 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
             inert_graph->particles.push_back(particles[i*2+1]);
             inert_graph->names.push_back(this->names[i]->deep_copy());
             inert_graph->size += 1;
-            if (particles[i*2] and particles[i*2+1]) { // Cas classique de split
+            if (particles[i*2] and particles[i*2+1]) { // Cas de split
                 // Cas sans split
                 inert_graph->amp = inert_graph->amp * unitary[0];
                 // Cas avec split
-                active_graph->particles.push_back(true);
+                if(i == 0 and not names[0]->get_left_copy()->contain_anchor(1)) {//Split en début et l'ancre est dans la partie de droite
+                    name_to_add_end = names[0]->get_left_copy();
+                } else {
+                    active_graph->particles.push_back(true);
+                    active_graph->particles.push_back(false);
+                    active_graph->names.push_back(this->names[i]->get_left_copy());
+                    active_graph->size++;
+                }
                 active_graph->particles.push_back(false);
-                active_graph->particles.push_back(false);
                 active_graph->particles.push_back(true);
-                active_graph->size += 2;
-                active_graph->amp = active_graph->amp * unitary[1];
-                active_graph->names.push_back(this->names[i]->get_left_copy());
                 active_graph->names.push_back(this->names[i]->get_right_copy());
+                active_graph->size++;
+                active_graph->amp = active_graph->amp * unitary[1];
                 new_s.push_back(active_graph);
             } else if (particles[i*2] and (not particles[i*2+1]) and (not particles[i*2+2]) and particles[i*2+3]) { // Cas de merge
                 // Cas sans merge
@@ -135,15 +141,9 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
         cur_s = std::move(new_s);
         new_s.clear();
         i+=1+merge;
-    }
-    while(!cur_s.empty()) { // Gestion du dernier noeud
-        auto* inert_graph = cur_s.back();
-        new_s.push_back(inert_graph);
-        inert_graph->particles.push_back(particles[2*size-2]);
-        inert_graph->particles.push_back(particles[2*size-1]);
-        inert_graph->names.push_back(names[size-1]->deep_copy());
-        inert_graph->size += 1;
-        cur_s.pop_back();
+        while(!cur_s.empty()){
+
+        }
     }
     return new_s;
 }
