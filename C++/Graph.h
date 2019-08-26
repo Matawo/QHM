@@ -17,13 +17,19 @@ public:
     Graph(unsigned int size,complex<double> amp, vector<bool> particles, vector<Name*> names);
     ~Graph();
 
+    Graph* copy();
+
     Graph* shift();
 
-//    unordered_set<Graph> * interaction(complex<double> * unitary);
+    std::vector<Graph*> interaction(const complex<double> unitary[4]);
 
     string to_string();
 
+    string to_string_amp();
+
     vector<Name*> names_copy();
+
+    size_t hash();
 
     bool operator==(const Graph &rhs) const;
 

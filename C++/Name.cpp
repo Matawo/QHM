@@ -45,17 +45,17 @@ bool SimpleName::is_brother(Name *other) {
 }
 
 SimpleName* SimpleName::get_son(bool right_or_left) {
-    vector<bool> new_vector = vector<bool>(this->t);
+    vector<bool> new_vector = std::move(this->t);
     new_vector.push_back(right_or_left);
     auto son_addr = new SimpleName(this-> value, new_vector);
     return son_addr;
 }
 
-Name* SimpleName::get_left() {
+Name* SimpleName::get_left_copy() {
     return this->get_son(LEFT);
 }
 
-Name* SimpleName::get_right() {
+Name* SimpleName::get_right_copy() {
     return this->get_son(RIGHT);
 }
 
@@ -88,12 +88,12 @@ string ComposedName::to_string() {
     return "("+ this->left->to_string() + "^" + this->right->to_string() + ")";
 }
 
-Name *ComposedName::get_left() {
-    return left;
+Name *ComposedName::get_left_copy() {
+    return left->deep_copy();
 }
 
-Name *ComposedName::get_right() {
-    return right;
+Name *ComposedName::get_right_copy() {
+    return right->deep_copy();
 }
 
 Name *ComposedName::normalize() {

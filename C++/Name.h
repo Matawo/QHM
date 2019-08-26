@@ -14,8 +14,8 @@ public :
     virtual size_t hash() = 0;
     virtual bool equals(Name* n) = 0;
     virtual std::string to_string() = 0;
-    virtual Name* get_left() = 0;
-    virtual Name* get_right() = 0;
+    virtual Name* get_left_copy() = 0;
+    virtual Name* get_right_copy() = 0;
     virtual Name* normalize() = 0;
     virtual Name*  deep_copy() = 0;
 };
@@ -37,9 +37,9 @@ public:
 
     bool is_brother(Name *other);
 
-    Name *get_left() override;
+    Name *get_left_copy() override;
 
-    Name *get_right() override;
+    Name *get_right_copy() override;
 
     Name *normalize() override;
 
@@ -64,9 +64,9 @@ public:
 
     std::string to_string() override;
 
-    Name *get_left() override;
+    Name *get_left_copy() override;
 
-    Name *get_right() override;
+    Name *get_right_copy() override;
 
     Name *normalize() override;
 
