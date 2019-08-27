@@ -86,35 +86,33 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
     while (i < size) { //On parcourt les noeuds un à un, le cas du noeud final est géré séparemment
         cout << "i = " << i << "\n";
         int merge = false;
-        Name* name_to_add_end; //Cas ou le split a lieu en début
         while(!cur_s.empty()) {
             auto* inert_graph = cur_s.back();
+            auto* active_graph = inert_graph->copy();
 //            cout << "check " << inert_graph << "check cur_s\n";
 //            cout << "debut copy " << inert_graph->copy() << "fin copy\n";
-            auto* active_graph = inert_graph->copy();
             inert_graph->particles.push_back(particles[i*2]);
             inert_graph->particles.push_back(particles[i*2+1]);
             inert_graph->names.push_back(this->names[i]->deep_copy());
             inert_graph->size += 1;
-            if (particles[i*2] and particles[i*2+1]) { // Cas de split
+            if (i and particles[i*2] and particles[i*2+1]) { // Cas de split, si i!=0
                 // Cas sans split
                 inert_graph->amp = inert_graph->amp * unitary[0];
                 // Cas avec split
-                if(i == 0 and not names[0]->get_left_copy()->contain_anchor(1)) {//Split en début et l'ancre est dans la partie de droite
-                    name_to_add_end = names[0]->get_left_copy();
-                } else {
-                    active_graph->particles.push_back(true);
-                    active_graph->particles.push_back(false);
-                    active_graph->names.push_back(this->names[i]->get_left_copy());
-                    active_graph->size++;
-                }
+                active_graph->particles.push_back(true);
+                active_graph->particles.push_back(false);
+                active_graph->names.push_back(this->names[i]->get_left_copy());
+                active_graph->size++;
                 active_graph->particles.push_back(false);
                 active_graph->particles.push_back(true);
                 active_graph->names.push_back(this->names[i]->get_right_copy());
                 active_graph->size++;
                 active_graph->amp = active_graph->amp * unitary[1];
                 new_s.push_back(active_graph);
-            } else if (particles[i*2] and (not particles[i*2+1]) and (not particles[i*2+2]) and particles[i*2+3]) { // Cas de merge
+                // Cas de merge L--R
+            } else if (particles[i*2] and (not particles[i*2+1])
+            and (not particles[i*2+2]) and particles[i*2+3]
+            and i!=size-1) {
                 // Cas sans merge
                 inert_graph->particles.push_back(false);
                 inert_graph->particles.push_back(true);
@@ -132,8 +130,8 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
                                 this->names[i+1]->deep_copy()));
                 new_s.push_back(active_graph);
                 merge = true;
-            } else {
-                delete active_graph; //Plutôt éviter de le créer !
+            } else{
+                delete active_graph;
             }
             new_s.push_back(inert_graph);
             cur_s.pop_back();
@@ -141,10 +139,36 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
         cur_s = std::move(new_s);
         new_s.clear();
         i+=1+merge;
-        while(!cur_s.empty()){
+    }
+    while(!cur_s.empty()){ //Gestion des cas particuliers (fusion begin_end et split begin)
+        auto* inert_graph = cur_s.back();
+        if(particles[0] and particles[1]) {
+            auto* active_graph = inert_graph->copy();
+            Name * name = names[0];
+            auto* right = name->get_right_copy();
+            auto* left = name->get_left_copy();
+            active_graph->particles[0] = false;
+            active_graph->particles[1] = true;
+            delete active_graph->names[0];
+            active_graph->names[0] = right;
+            active_graph->size++;
+            if(left->contain_anchor(1)) {//Ajout sur place
+                active_graph->particles.insert(active_graph->particles.begin(), false);
+                active_graph->particles.insert(active_graph->particles.begin(), true);
+                active_graph->names.insert(active_graph->names.begin(), left);
+            } else {
+                active_graph->particles.push_back(true);
+                active_graph->particles.push_back(false);
+                active_graph->names.push_back(name->get_left_copy());
+            }
+            new_s.push_back(active_graph);
+        } else if (particles[2*size-2] and particles[1] and not particles[0] and not particles[2*size-1]) {
 
         }
+        new_s.push_back(inert_graph);
+        cur_s.pop_back();
     }
+    cur_s.clear();
     return new_s;
 }
 

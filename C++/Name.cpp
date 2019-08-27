@@ -44,10 +44,6 @@ bool SimpleName::is_brother(Name *other) {
     return true;
 }
 
-bool SimpleName::contains_anchor(int anchor){
-
-}
-
 SimpleName* SimpleName::get_son(bool right_or_left) {
     vector<bool> new_vector = std::move(this->t);
     new_vector.push_back(right_or_left);

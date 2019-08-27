@@ -13,7 +13,7 @@ int main(){
                                            std::complex<double>(1/sqrt(2),0.0),std::complex<double>(-1/sqrt(2),0.0)};
     SimpleName* n4 = new SimpleName(4,{});
     auto * a = new ComposedName(n1,n4);
-    vector<bool> particles = {true,false,true,true,false,true};
+    vector<bool> particles = {true,true,true,true,false,true};
     vector<Name*> names = {a,n2,n3};
     auto * test = new Graph(3, std::complex<double>(1.0, 0.0), particles , names);
     cout << test->to_string_amp() << "\n";
