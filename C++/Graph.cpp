@@ -84,7 +84,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
     cur_s.push_back(new Graph(0,amp,{},{}));
     int i = 0;
     while (i < size) { //On parcourt les noeuds un à un, le cas du noeud final est géré séparemment
-        cout << "i = " << i << "\n";
+   //     cout << "i = " << i << "\n";
         int merge = false;
         while(!cur_s.empty()) {
             auto* inert_graph = cur_s.back();
@@ -110,20 +110,19 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
                 active_graph->amp = active_graph->amp * unitary[1];
                 new_s.push_back(active_graph);
                 // Cas de merge L--R
-            } else if (particles[i*2] and (not particles[i*2+1])
-            and (not particles[i*2+2]) and particles[i*2+3]
-            and i!=size-1) {
+            } else if (i<size-1 and particles[i*2] and (not particles[i*2+1])
+            and (not particles[i*2+2]) and particles[i*2+3]) {
                 // Cas sans merge
                 inert_graph->particles.push_back(false);
                 inert_graph->particles.push_back(true);
                 inert_graph->size +=1;
-                inert_graph->amp = inert_graph->amp * unitary[4];
+                inert_graph->amp = inert_graph->amp * unitary[3];
                 inert_graph->names.push_back(this->names[i+1]);
                 // Cas avec merge
                 active_graph->particles.push_back(true);
                 active_graph->particles.push_back(true);
                 active_graph->size += 1;
-                active_graph->amp = active_graph->amp * unitary[3];
+                active_graph->amp = active_graph->amp * unitary[2];
                 active_graph->names.push_back(
                         new ComposedName(
                                 this->names[i]->deep_copy(),
@@ -140,10 +139,12 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
         new_s.clear();
         i+=1+merge;
     }
-    while(!cur_s.empty()){ //Gestion des cas particuliers (fusion begin_end et split begin)
+    while(!cur_s.empty()){ //Gestion des cas particuliers (merge begin_end et split begin)
         auto* inert_graph = cur_s.back();
-        if(particles[0] and particles[1]) {
+        if(particles[0] and particles[1]) { //Split begining
             auto* active_graph = inert_graph->copy();
+            inert_graph->amp = inert_graph->amp * unitary[0];
+            active_graph->amp = active_graph->amp * unitary[1];
             Name * name = names[0];
             auto* right = name->get_right_copy();
             auto* left = name->get_left_copy();
@@ -159,11 +160,22 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
             } else {
                 active_graph->particles.push_back(true);
                 active_graph->particles.push_back(false);
-                active_graph->names.push_back(name->get_left_copy());
+                active_graph->names.push_back(left);
             }
             new_s.push_back(active_graph);
         } else if (particles[2*size-2] and particles[1] and not particles[0] and not particles[2*size-1]) {
+            auto* active_graph = inert_graph->copy();
+            Name * name = active_graph->names[0];
+            inert_graph->amp = inert_graph->amp * unitary[3];
+            active_graph->amp = active_graph->amp * unitary[2];
 
+            active_graph->names[0]= new ComposedName(active_graph->names[active_graph->size-1],name);
+            active_graph->names.pop_back();
+            active_graph->particles[0]=true;
+            active_graph->size--;
+            active_graph->particles.pop_back();
+            active_graph->particles.pop_back();
+            new_s.push_back(active_graph);
         }
         new_s.push_back(inert_graph);
         cur_s.pop_back();
@@ -194,9 +206,23 @@ bool Graph::operator!=(const Graph &rhs) const {
     return !(rhs == *this);
 }
 
+const complex<double> &Graph::getAmp() const {
+    return amp;
+}
+
+void Graph::setAmp(const complex<double> &amp) {
+    Graph::amp = amp;
+}
+
 size_t Graph::hash() {
     std::hash<std::string> hash_fn;
     size_t str_hash = hash_fn(this->to_string());
     return str_hash;
+}
+
+bool Graph::equals(Graph *other) {
+    return size == other->size &&
+           particles == other->particles &&
+           names == other->names;
 }
 

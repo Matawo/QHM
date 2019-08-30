@@ -131,3 +131,7 @@ Name *ComposedName::deep_copy() {
 bool ComposedName::contain_anchor(int i) {
     return left->contain_anchor(i) or right->contain_anchor(i);
 }
+
+bool Name::operator==(Name* other){
+    return this->equals(other);
+}

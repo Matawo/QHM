@@ -19,6 +19,7 @@ public :
     virtual Name* normalize() = 0;
     virtual Name*  deep_copy() = 0;
     virtual bool contain_anchor(int i) = 0;
+    bool operator==(Name* other);
 };
 
 class SimpleName: public Name {
@@ -49,7 +50,6 @@ public:
     bool contain_anchor(int i) override;
 
 
-
 private:
     //True = right, false = left
     SimpleName*  get_son(bool);
@@ -76,6 +76,7 @@ public:
     Name *deep_copy() override;
 
     bool contain_anchor(int i) override;
+
 
 
 private:

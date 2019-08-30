@@ -37,6 +37,12 @@ public:
 
     bool operator<(const Graph &rhs) const;
 
+    const complex<double> &getAmp() const;
+
+    void setAmp(const complex<double> &amp);
+
+    bool equals(Graph *other);
+
 
 private:
     unsigned int size;
