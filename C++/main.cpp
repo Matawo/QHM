@@ -1,10 +1,13 @@
 #include <iostream>
 #include <memory>
 #include <algorithm>
+#include <chrono>
 #include "Name.h"
 #include "Name.cpp"
 #include "Graph.h"
 #include <unordered_map>
+
+double error_margin = pow(10.0,-9);
 
 complex<double> calculate_norm(vector<Graph*> superposition) {
     complex<double> result = std::complex<double>(0.0,0.0);
@@ -14,22 +17,33 @@ complex<double> calculate_norm(vector<Graph*> superposition) {
     return result;
 }
 
-void merge_graphs(vector<Graph*>superposition) {
-    std::unordered_map<size_t, Graph*> sorted = unordered_map<size_t,Graph*>(0);
+double norm(std::complex<double> a) {
+    return a.real() * a.real() - a.imag() * a.imag();
+}
+
+void merge_graphs(vector<Graph*>&superposition) {
+    std::unordered_multimap<size_t, Graph*> sorted = unordered_multimap<size_t,Graph*>(0);
     while(!superposition.empty()){
         auto graph = superposition.back();
         size_t hash = graph->hash();
-        auto g2 = sorted[hash];
-        if(g2 != NULL and g2->equals(graph)) {
-            g2->setAmp(g2->getAmp() + graph->getAmp());
-            delete graph;
-        }  else {
+        auto range = sorted.equal_range(hash);
+        bool exist = false;
+        for(auto it = range.first; it!=range.second; it++) {
+           if (graph->equals(it->second)) {
+               it->second->setAmp(it->second->getAmp()+graph->getAmp());
+               exist = true;
+               delete graph;
+           }
+        }
+        if(not exist) {
             sorted.insert(std::pair<size_t,Graph*>(hash,graph));
         }
         superposition.pop_back();
     }
     for (auto &it : sorted) {
-        superposition.push_back(it.second);
+        if ( norm(it.second->getAmp())> error_margin) {
+            superposition.push_back(it.second);
+        }
     }
 }
 
@@ -77,23 +91,31 @@ int main(){
     auto * test = new Graph(3, std::complex<double>(1.0, 0.0), particles , names);
     vector<Graph*> superposition = vector<Graph*>(0);
     superposition.push_back(test);
-    for(int i = 0; i<5; i++) {
-        cout << to_string(superposition) << "\n";
+    typedef std::chrono::high_resolution_clock Time;
+    typedef std::chrono::milliseconds ms;
+    typedef std::chrono::duration<float> fsec;
+    auto t0 = Time::now();
+    for(int i = 0; i<12; i++) {
         shift(superposition);
         cout << "shift \n" ;
-        cout << to_string(superposition) << "\n";
+        //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << "\n";
         interaction(superposition, hadamard);
         cout << "interaction \n";
         //cout << to_string(superposition) << "\n";
-        cout << "Norm :" << calculate_norm(superposition) << "\n";
+        cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
         merge_graphs(superposition);
         cout << "merge \n" ;
         //cout << to_string(superposition) << "\n";
-        cout << "Norm :" << calculate_norm(superposition) << "\n";
+        cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
+        cout << superposition.size() << "\n";
     }
     for(auto &graph:superposition) {
         delete graph;
     }
+    auto t1 = Time::now();
+    fsec fs = t1 - t0;
+    ms d = std::chrono::duration_cast<ms>(fs);
+    std::cout << fs.count() << "s\n";
     return 0;
 }

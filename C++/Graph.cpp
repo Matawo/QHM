@@ -117,7 +117,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
                 inert_graph->particles.push_back(true);
                 inert_graph->size +=1;
                 inert_graph->amp = inert_graph->amp * unitary[3];
-                inert_graph->names.push_back(this->names[i+1]);
+                inert_graph->names.push_back(this->names[i+1]->deep_copy());
                 // Cas avec merge
                 active_graph->particles.push_back(true);
                 active_graph->particles.push_back(true);

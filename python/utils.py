@@ -1,5 +1,5 @@
 from scipy import linalg
-from python.QHM import *
+from QHM import *
 import numpy as np
 from math import *
 import time
@@ -20,7 +20,7 @@ def run(qhm, nb_sc, nb_step):  # Lance un run sur qhm, de nb_sc secondes, de nb_
     data = []
     n = 0
     while time.time() - start< nb_sc and n < nb_step:
-        print(n,time.time() - start)
+        print(n, qhm.number_of_graphs(), time.time() - start)
         # Etape de rotation Ur |--L--> = a |--L--> + b |--R-->
         time_rotation -= time.time()
         qhm.update_dict(qhm.rotation_step())
