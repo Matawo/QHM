@@ -11,6 +11,14 @@
 #define RIGHT true
 #define LEFT false
 
+Name* safe_new_cn(Name * left, Name * right) {
+    auto left_cn = dynamic_cast<SimpleName*>(left);
+    if (left_cn == nullptr || not left_cn->is_brother(right)) {return new ComposedName(left,right);}
+    left_cn->t.pop_back();
+    delete right;
+    return left_cn;
+}
+
 SimpleName::SimpleName(int value,const vector<bool> &t) : value(value), t(t) {}
 
 size_t SimpleName::hash() {
@@ -34,11 +42,11 @@ string SimpleName::to_string() {
 
 bool SimpleName::is_brother(Name *other) {
     auto other_ptr = dynamic_cast<SimpleName*>(other);
-    if (other_ptr == nullptr or this->t.empty()) {
+    if (other_ptr == nullptr or this->t.empty() or (this->t.size() != other_ptr->t.size())) {
         return false;
     } else {
-        for(unsigned long i = 0; i < this->t.size() -1; i++) {
-            if (this->t.at(i) != other_ptr->t.at(i)) { return false;}
+        for(int i = 0; i < min(this->t.size() -1,other_ptr->t.size() -1) ; i++) {
+            if (this->t[i] != other_ptr->t[i]) { return false;}
         }
     }
     return true;

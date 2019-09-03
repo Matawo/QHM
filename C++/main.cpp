@@ -32,6 +32,9 @@ void merge_graphs(vector<Graph*>&superposition) {
            if (graph->equals(it->second)) {
                it->second->setAmp(it->second->getAmp()+graph->getAmp());
                exist = true;
+               if(graph->to_string() != it->second->to_string()) {
+                   cout << graph->to_string_amp() << "     " <<it->second->to_string_amp() << "\n";
+               }
                delete graph;
            }
         }
@@ -41,8 +44,11 @@ void merge_graphs(vector<Graph*>&superposition) {
         superposition.pop_back();
     }
     for (auto &it : sorted) {
+        cout << it.second->to_string() << "\n";
         if ( norm(it.second->getAmp())> error_margin) {
             superposition.push_back(it.second);
+        } else {
+            delete it.second;
         }
     }
 }
@@ -79,15 +85,15 @@ void interaction(vector<Graph*>&superposition,const std::complex<double> * unita
 
 int main(){
     //WARNING : dans la version actuelle, le premier nom doit contenir l'ancre default = 1.lll... (l==false)
-    SimpleName* n1 = new SimpleName(1,{false});
+    SimpleName* n1 = new SimpleName(1,{});
     SimpleName* n2 = new SimpleName(2,{});
     SimpleName* n3 = new SimpleName(3,{});
     const std::complex<double> hadamard[4] = {std::complex<double>(1/sqrt(2),0.0),std::complex<double>(1/sqrt(2),0.0),
                                            std::complex<double>(1/sqrt(2),0.0),std::complex<double>(-1/sqrt(2),0.0)};
-    SimpleName* n4 = new SimpleName(4,{});
-    auto * a = new ComposedName(n1,n4);
+    //SimpleName* n4 = new SimpleName(4,{});
+    //auto * a = new ComposedName(n1,n4);
     vector<bool> particles = {false,true,true,true,true,false};
-    vector<Name*> names = {a,n2,n3};
+    vector<Name*> names = {n1,n2,n3};
     auto * test = new Graph(3, std::complex<double>(1.0, 0.0), particles , names);
     vector<Graph*> superposition = vector<Graph*>(0);
     superposition.push_back(test);
@@ -95,7 +101,10 @@ int main(){
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    for(int i = 0; i<12; i++) {
+
+    merge_graphs(superposition);
+
+    for(int i = 0; i<3; i++) {
         shift(superposition);
         cout << "shift \n" ;
         //cout << to_string(superposition) << "\n";

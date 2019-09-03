@@ -124,7 +124,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
                 active_graph->size += 1;
                 active_graph->amp = active_graph->amp * unitary[2];
                 active_graph->names.push_back(
-                        new ComposedName(
+                        safe_new_cn(
                                 this->names[i]->deep_copy(),
                                 this->names[i+1]->deep_copy()));
                 new_s.push_back(active_graph);
@@ -169,7 +169,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
             inert_graph->amp = inert_graph->amp * unitary[3];
             active_graph->amp = active_graph->amp * unitary[2];
 
-            active_graph->names[0]= new ComposedName(active_graph->names[active_graph->size-1],name);
+            active_graph->names[0]= safe_new_cn(active_graph->names[active_graph->size-1],name);
             active_graph->names.pop_back();
             active_graph->particles[0]=true;
             active_graph->size--;
@@ -221,8 +221,14 @@ size_t Graph::hash() {
 }
 
 bool Graph::equals(Graph *other) {
-    return size == other->size &&
-           particles == other->particles &&
-           names == other->names;
+    if(size != other->size or  particles != other->particles ) {
+        return false;
+    }
+    for(int i=0; i<size;i++) {
+        if(not names[i]->equals(other->names[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 

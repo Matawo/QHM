@@ -8,6 +8,7 @@
 
 using namespace std;
 
+
 class Name {
 public :
     virtual ~Name() = default;;
@@ -83,5 +84,7 @@ private:
     Name *left;
     Name *right;
 };
+
+Name* safe_new_cn(Name *left, Name * right);
 
 #endif //HM_QUANTIQUE_NAME_H
