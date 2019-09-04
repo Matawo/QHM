@@ -2,9 +2,14 @@
 
 #include <utility>
 
+#include <utility>
+
+#include <utility>
+
 //
 // Created by Nicolas Durbec on 25/03/19.
 //
+
 
 #include "Graph.h"
 #include <unordered_set>
@@ -18,8 +23,8 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
     hash_combine(seed, rest...);
 }
 
-Graph::Graph(unsigned int size,complex<double> amp, vector<bool> particles, vector<Name*> names) : particles(std::move(
-        particles)), names(std::move(names)), amp(amp), size(size) {}
+Graph::Graph(unsigned int size,complex<double> amp, vector<bool> particles, vector<Name*> names) :
+particles(std::move(particles)), names(std::move(names)), amp(amp), size(size) {}
 
 string Graph::to_string_amp() {
     string str;
@@ -27,6 +32,15 @@ string Graph::to_string_amp() {
     str += this->to_string();
     return str;
 }
+
+string to_string_sup(vector<Graph*>superposition) {
+    string result;
+    for(auto &graph:superposition) {
+        result += graph->to_string_amp() + "\n";
+    }
+    return result;
+}
+
 
 Graph* Graph::copy() {
 //    cout << to_string();
@@ -81,6 +95,7 @@ Graph::~Graph() {
 std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
     auto cur_s = std::vector<Graph*>(0);
     std::vector<Graph*> new_s;
+//    cout << "GRAPHE : " <<  this->to_string() << "\n";
     cur_s.push_back(new Graph(0,amp,{},{}));
     int i = 0;
     while (i < size) { //On parcourt les noeuds un à un, le cas du noeud final est géré séparemment
@@ -94,7 +109,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
             inert_graph->particles.push_back(particles[i*2]);
             inert_graph->particles.push_back(particles[i*2+1]);
             inert_graph->names.push_back(this->names[i]->deep_copy());
-            inert_graph->size += 1;
+            inert_graph->size++;
             if (i and particles[i*2] and particles[i*2+1]) { // Cas de split, si i!=0
                 // Cas sans split
                 inert_graph->amp = inert_graph->amp * unitary[0];
@@ -142,6 +157,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
     while(!cur_s.empty()){ //Gestion des cas particuliers (merge begin_end et split begin)
         auto* inert_graph = cur_s.back();
         if(particles[0] and particles[1]) { //Split begining
+//            cout << "A : " << inert_graph->to_string() << "\n";
             auto* active_graph = inert_graph->copy();
             inert_graph->amp = inert_graph->amp * unitary[0];
             active_graph->amp = active_graph->amp * unitary[1];
@@ -164,6 +180,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
             }
             new_s.push_back(active_graph);
         } else if (particles[2*size-2] and particles[1] and not particles[0] and not particles[2*size-1]) {
+//            cout << "B : " << inert_graph->to_string() << "\n";
             auto* active_graph = inert_graph->copy();
             Name * name = active_graph->names[0];
             inert_graph->amp = inert_graph->amp * unitary[3];
@@ -181,6 +198,7 @@ std::vector<Graph*> Graph::interaction(const complex<double> unitary[4]) {
         cur_s.pop_back();
     }
     cur_s.clear();
+//    cout << to_string_sup(new_s);
     return new_s;
 }
 

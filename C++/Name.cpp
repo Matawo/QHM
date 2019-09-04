@@ -42,9 +42,13 @@ string SimpleName::to_string() {
 
 bool SimpleName::is_brother(Name *other) {
     auto other_ptr = dynamic_cast<SimpleName*>(other);
-    if (other_ptr == nullptr or this->t.empty() or (this->t.size() != other_ptr->t.size())) {
+    if ((other_ptr == nullptr)
+    or (this->value!= other_ptr->value)
+    or (this->t.empty())
+    or (this->t.size() != other_ptr->t.size())) {
         return false;
-    } else {
+    }
+    else {
         for(int i = 0; i < min(this->t.size() -1,other_ptr->t.size() -1) ; i++) {
             if (this->t[i] != other_ptr->t[i]) { return false;}
         }
@@ -53,7 +57,7 @@ bool SimpleName::is_brother(Name *other) {
 }
 
 SimpleName* SimpleName::get_son(bool right_or_left) {
-    vector<bool> new_vector = std::move(this->t);
+    vector<bool> new_vector = this->t;
     new_vector.push_back(right_or_left);
     auto son_addr = new SimpleName(this-> value, new_vector);
     return son_addr;

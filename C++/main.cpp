@@ -7,7 +7,7 @@
 #include "Graph.h"
 #include <unordered_map>
 
-double error_margin = pow(10.0,-9);
+double error_margin = pow(10.0,-20);
 
 complex<double> calculate_norm(vector<Graph*> superposition) {
     complex<double> result = std::complex<double>(0.0,0.0);
@@ -32,9 +32,7 @@ void merge_graphs(vector<Graph*>&superposition) {
            if (graph->equals(it->second)) {
                it->second->setAmp(it->second->getAmp()+graph->getAmp());
                exist = true;
-               if(graph->to_string() != it->second->to_string()) {
-                   cout << graph->to_string_amp() << "     " <<it->second->to_string_amp() << "\n";
-               }
+               //cout << graph->to_string_amp() << "     " <<it->second->to_string_amp() << "\n";
                delete graph;
            }
         }
@@ -44,7 +42,6 @@ void merge_graphs(vector<Graph*>&superposition) {
         superposition.pop_back();
     }
     for (auto &it : sorted) {
-        cout << it.second->to_string() << "\n";
         if ( norm(it.second->getAmp())> error_margin) {
             superposition.push_back(it.second);
         } else {
@@ -101,11 +98,9 @@ int main(){
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-
-    merge_graphs(superposition);
-
-    for(int i = 0; i<3; i++) {
+    for(int i = 0; i<12; i++) {
         shift(superposition);
+        merge_graphs(superposition);
         cout << "shift \n" ;
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << "\n";
@@ -114,7 +109,7 @@ int main(){
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
         merge_graphs(superposition);
-        cout << "merge \n" ;
+        cout << "merge \n";
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
         cout << superposition.size() << "\n";
