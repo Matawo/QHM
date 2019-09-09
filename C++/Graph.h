@@ -31,9 +31,9 @@ public:
 
     size_t hash();
 
-    bool operator==(const Graph &rhs) const;
+    bool operator==(Graph &rhs);
 
-    bool operator!=(const Graph &rhs) const;
+    bool operator!=(Graph &rhs);
 
     bool operator<(const Graph &rhs) const;
 
@@ -51,5 +51,5 @@ private:
     std::vector<Name*> names;
 };
 
-
+bool compare_graph_ptr(Graph* a, Graph* b);
 #endif //QHM_GRAPH_H

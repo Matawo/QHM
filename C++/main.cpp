@@ -21,6 +21,16 @@ double norm(std::complex<double> a) {
     return a.real() * a.real() - a.imag() * a.imag();
 }
 
+string to_string(vector<Graph*>superposition) {
+    string result;
+    for(auto &graph:superposition) {
+        result += graph->to_string_amp() + "\n";
+    }
+    return result;
+}
+
+
+
 void merge_graphs(vector<Graph*>&superposition) {
     std::unordered_multimap<size_t, Graph*> sorted = unordered_multimap<size_t,Graph*>(0);
     while(!superposition.empty()){
@@ -50,6 +60,28 @@ void merge_graphs(vector<Graph*>&superposition) {
     }
 }
 
+void merge_graphs2(vector<Graph*>&superposition) {
+    //cout << to_string(superposition) << "\n";
+    std::sort(superposition.begin(),superposition.end(), compare_graph_ptr);
+    vector<Graph*> result = vector<Graph*>(0);
+    result.push_back(superposition.back());
+    superposition.pop_back();
+    while(not superposition.empty()) {
+        if(superposition.back()->equals(result.back())) {
+            result.back()->setAmp(result.back()->getAmp()+superposition.back()->getAmp());
+        } else {
+            result.push_back(superposition.back());
+        }
+        superposition.pop_back();
+        if(norm(result.back()->getAmp()) <= error_margin) {
+            result.pop_back();
+        }
+    }
+    superposition = std::move(result);
+    std::sort(superposition.begin(),superposition.end(), compare_graph_ptr);
+    //cout << to_string(superposition) << "\n";
+}
+
 void shift(vector<Graph*>&superposition) {
     vector<Graph*> result = vector<Graph*>(0);
     for(auto &graph:superposition) {
@@ -58,15 +90,6 @@ void shift(vector<Graph*>&superposition) {
     }
     superposition = result;
 }
-
-string to_string(vector<Graph*>superposition) {
-    string result;
-    for(auto &graph:superposition) {
-        result += graph->to_string_amp() + "\n";
-    }
-    return result;
-}
-
 
 void interaction(vector<Graph*>&superposition,const std::complex<double> * unitary) {
     vector<Graph*> result = vector<Graph*>(0);
@@ -98,9 +121,8 @@ int main(){
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    for(int i = 0; i<12; i++) {
+    for(int i = 0; i<5; i++) {
         shift(superposition);
-        merge_graphs(superposition);
         cout << "shift \n" ;
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << "\n";
@@ -108,7 +130,7 @@ int main(){
         cout << "interaction \n";
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
-        merge_graphs(superposition);
+        merge_graphs2(superposition);
         cout << "merge \n";
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";

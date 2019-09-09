@@ -146,4 +146,36 @@ bool ComposedName::contain_anchor(int i) {
 
 bool Name::operator==(Name* other){
     return this->equals(other);
+
+}bool Name::operator!=(Name* other){
+    return not this->equals(other);
+}
+
+bool Name::operator<(Name *rhs) {
+    cout << to_string() <<" vs"<< rhs->to_string() << " \n";
+    auto left = dynamic_cast<SimpleName*>(this);
+    auto right = dynamic_cast<SimpleName*>(rhs);
+    if(left != nullptr and right != nullptr) {
+        if (left->value != right->value) {
+            return left->value < right->value;
+        }
+        return left->t < right->t;
+    } else if (left == nullptr and right != nullptr) {
+        return false;
+    } else if (left != nullptr) {
+        return true;
+    }
+    auto leftc = dynamic_cast<ComposedName*>(this);
+    auto rightc = dynamic_cast<ComposedName*>(rhs);
+    bool compare_left = &leftc->left < &rightc->left;
+    if (compare_left) {
+        return true;
+    }
+    else if (&leftc != &rightc) {
+        return false;
+    } else {
+        return &leftc->right < &rightc->right;
+    }
+
+
 }

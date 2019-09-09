@@ -211,16 +211,23 @@ bool Graph::operator<(const Graph &rhs) const {
         return true;
     if (rhs.particles < particles)
         return false;
-    return names < rhs.names;
+    for(int i= 0; i<size; i++) {
+        cout << i <<"\n";
+        if(&names[i]<&rhs.names[i]) {
+            return true;
+        }
+        if(&rhs.names[i]<&names[i]) {
+            return false;
+        }
+    }
+    return false;
 }
 
-bool Graph::operator==(const Graph &rhs) const {
-    return size == rhs.size &&
-           particles == rhs.particles &&
-           names == rhs.names;
+bool Graph::operator==(Graph &rhs) {
+    return this->equals(&rhs);
 }
 
-bool Graph::operator!=(const Graph &rhs) const {
+bool Graph::operator!=(Graph &rhs) {
     return !(rhs == *this);
 }
 
@@ -250,3 +257,4 @@ bool Graph::equals(Graph *other) {
     return true;
 }
 
+bool compare_graph_ptr(Graph* a, Graph* b) { return (*a < *b); }

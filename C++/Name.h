@@ -21,6 +21,8 @@ public :
     virtual Name*  deep_copy() = 0;
     virtual bool contain_anchor(int i) = 0;
     bool operator==(Name* other);
+    bool operator!=(Name* other);
+    bool operator<(Name* rhs);
 };
 
 class SimpleName: public Name {
@@ -79,8 +81,6 @@ public:
     bool contain_anchor(int i) override;
 
 
-
-private:
     Name *left;
     Name *right;
 };
