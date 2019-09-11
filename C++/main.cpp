@@ -91,6 +91,19 @@ void shift(vector<Graph*>&superposition) {
     superposition = result;
 }
 
+void parallel_shift(vector<Graph*>&superposition) {
+    vector<Graph*> result = vector<Graph*>(0);
+    for(auto &graph:superposition) {
+        result.push_back(graph->shift());
+        delete graph;
+    }
+    superposition = result;
+}
+
+void safe_insert() {
+
+}
+
 void interaction(vector<Graph*>&superposition,const std::complex<double> * unitary) {
     vector<Graph*> result = vector<Graph*>(0);
     while(!superposition.empty()) {
@@ -103,13 +116,33 @@ void interaction(vector<Graph*>&superposition,const std::complex<double> * unita
     superposition = result;
 }
 
-int main(){
+int open_mp() {
+    SimpleName* n1 = new SimpleName(1,{});
+    SimpleName* n2 = new SimpleName(2,{});
+    SimpleName* n3 = new SimpleName(3,{});
+    const std::complex<double> hadamard[4] = {std::complex<double>(1/sqrt(2),0.0),std::complex<double>(1/sqrt(2),0.0),
+                                              std::complex<double>(1/sqrt(2),0.0),std::complex<double>(-1/sqrt(2),0.0)};
+    vector<bool> particles = {false,true,true,true,true,false};
+    vector<Name*> names = {n1,n2,n3};
+    auto * graph_init = new Graph(3, std::complex<double>(1.0, 0.0), particles , names);
+    typedef std::chrono::high_resolution_clock Time;
+    typedef std::chrono::milliseconds ms;
+    typedef std::chrono::duration<float> fsec;
+    auto t0 = Time::now();
+    const int nb_thread = 4;
+
+    // the table is now initialized
+
+    return 0;
+}
+
+int sequentiel() {
     //WARNING : dans la version actuelle, le premier nom doit contenir l'ancre default = 1.lll... (l==false)
     SimpleName* n1 = new SimpleName(1,{});
     SimpleName* n2 = new SimpleName(2,{});
     SimpleName* n3 = new SimpleName(3,{});
     const std::complex<double> hadamard[4] = {std::complex<double>(1/sqrt(2),0.0),std::complex<double>(1/sqrt(2),0.0),
-                                           std::complex<double>(1/sqrt(2),0.0),std::complex<double>(-1/sqrt(2),0.0)};
+                                              std::complex<double>(1/sqrt(2),0.0),std::complex<double>(-1/sqrt(2),0.0)};
     //SimpleName* n4 = new SimpleName(4,{});
     //auto * a = new ComposedName(n1,n4);
     vector<bool> particles = {false,true,true,true,true,false};
@@ -130,7 +163,7 @@ int main(){
         cout << "interaction \n";
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
-        merge_graphs2(superposition);
+        merge_graphs(superposition);
         cout << "merge \n";
         //cout << to_string(superposition) << "\n";
         cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size() << "\n";
@@ -144,4 +177,8 @@ int main(){
     ms d = std::chrono::duration_cast<ms>(fs);
     std::cout << fs.count() << "s\n";
     return 0;
+}
+
+int main(){
+    open_mp();
 }
