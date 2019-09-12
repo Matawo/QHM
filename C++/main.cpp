@@ -6,6 +6,7 @@
 #include "Name.cpp"
 #include "Graph.h"
 #include <unordered_map>
+#include <mutex>
 
 double error_margin = pow(10.0,-20);
 
@@ -100,8 +101,33 @@ void parallel_shift(vector<Graph*>&superposition) {
     superposition = result;
 }
 
-void safe_insert() {
-
+void safe_insert(int nb_thread,unordered_multimap<size_t,Graph*>**superposition, Graph* graph, unordered_map<size_t,mutex*> &mutexes, mutex &master) {
+    size_t hash = graph->hash();
+    size_t i = hash%nb_thread;
+    auto sorted = superposition[i];
+    while (mutexes.find(hash) == mutexes.end()) {
+        while (not master.try_lock()) {}
+        if(mutexes.find(hash) == mutexes.end()) {
+            auto * m = new mutex();
+            mutexes.insert(std::pair<size_t,mutex*>(hash,m));
+        }
+        master.unlock();
+    }
+    while(not mutexes[hash]->try_lock()) {
+        auto range = superposition[i]->equal_range(hash);
+        bool exist = false;
+        for(auto it = range.first; it!=range.second; it++) {
+            if (graph->equals(it->second)) {
+                it->second->setAmp(it->second->getAmp()+graph->getAmp());
+                exist = true;
+                //cout << graph->to_string_amp() << "     " <<it->second->to_string_amp() << "\n";
+                delete graph;
+            }
+        }
+        if(not exist) {
+            sorted.insert(std::pair<size_t,Graph*>(hash,graph));
+        }
+    }
 }
 
 void interaction(vector<Graph*>&superposition,const std::complex<double> * unitary) {

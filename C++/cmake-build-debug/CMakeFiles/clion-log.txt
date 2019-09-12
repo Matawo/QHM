@@ -1,4 +1,20 @@
 /home/matawo/clion-2018.3.4/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/matawo/CLionProjects/QHM/C++
--- Configuring done
--- Generating done
--- Build files have been written to: /home/matawo/CLionProjects/QHM/C++/cmake-build-debug
+CMake Error at /home/matawo/clion-2018.3.4/bin/cmake/linux/share/cmake-3.13/Modules/FindBoost.cmake:2100 (message):
+  Unable to find the requested Boost libraries.
+
+  Unable to find the Boost header files.  Please set BOOST_ROOT to the root
+  directory containing Boost or BOOST_INCLUDEDIR to the directory containing
+  Boost's headers.
+Call Stack (most recent call first):
+  CMakeLists.txt:6 (find_package)
+
+
+CMake Error: The following variables are used in this project, but they are set to NOTFOUND.
+Please set them or make sure they are set and tested correctly in the CMake files:
+Boost_INCLUDE_DIR (ADVANCED)
+   used as include directory in directory /home/matawo/CLionProjects/QHM/C++
+   used as include directory in directory /home/matawo/CLionProjects/QHM/C++
+   used as include directory in directory /home/matawo/CLionProjects/QHM/C++
+
+-- Configuring incomplete, errors occurred!
+See also "/home/matawo/CLionProjects/QHM/C++/cmake-build-debug/CMakeFiles/CMakeOutput.log".
