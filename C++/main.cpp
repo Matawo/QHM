@@ -133,24 +133,14 @@ void interaction(vector<Graph*>&superposition,const std::complex<double> * unita
 }
 
 void safe_insert(int nb_thread,unordered_multimap<size_t,Graph*>**superposition, Graph* graph,
-        unordered_map<size_t,mutex*> *mutexes, mutex* master) {
+        vector<std::mutex*> mutexes) {
     size_t hash = graph->hash();
     size_t i = hash%nb_thread;
     auto sorted = superposition[i];
-    while (mutexes->find(hash) == mutexes->end()) {
-        while (not master->try_lock()) {}
-        //cout << "<" << omp_get_thread_num();
-        if(mutexes->find(hash) == mutexes->end()) {
-            auto * m = new mutex();
-            mutexes->insert(std::pair<size_t,mutex*>(hash,m));
-        }
-        //cout << omp_get_thread_num() << ">\n";
-        master->unlock();
-    }
-    auto m = mutexes->find(hash);
-    while(not m->second->try_lock()) {}
-    //while (not master->try_lock()) {}
-    cout << " hash " << hash << " <" << omp_get_thread_num();
+    auto m = mutexes[hash % (nb_thread * 10)];
+    //cout << " hash " << hash % (nb_thread * 10);
+    while(not m->try_lock()) {}
+    //cout << " <" << omp_get_thread_num();
     auto range = sorted->equal_range(hash);
     bool exist = false;
     for(auto it = range.first; it!=range.second; it++) {
@@ -165,17 +155,10 @@ void safe_insert(int nb_thread,unordered_multimap<size_t,Graph*>**superposition,
     if(not exist) {
         sorted->insert(std::pair<size_t,Graph*>(hash,graph));
     }
-    cout << omp_get_thread_num() << ">\n";
-    m->second->unlock();
+    //cout << omp_get_thread_num() << ">\n";
+    m->unlock();
 }
 
-void copy_and_delete(int nb_thread, unordered_multimap<size_t,Graph*>**superposition,
-        unordered_multimap<size_t,Graph*>**new_superposition) {
-    for (int i = 0; i< nb_thread;i++) {
-        *superposition[i] = *new_superposition[i];
-        new_superposition[i] = new unordered_multimap<size_t, Graph*>(0);
-    }
-}
 
 int open_mp() {
     //init
@@ -191,65 +174,64 @@ int open_mp() {
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    const int nb_thread = 4;
+    const int nb_thread = 1;
     omp_set_num_threads(nb_thread);
-    auto * master = new mutex();
-    unordermultimap<size_t, Graph*> *superposition[nb_thread];
+    unordered_multimap<size_t, Graph*> *superposition[nb_thread];
     unordered_multimap<size_t, Graph*> *new_superposition[nb_thread];
-    auto mutexes = new unordered_map<size_t ,mutex*>();
-    mutex mutexes[nb_thread*10]
+    vector<std::mutex*> mutexes;
     for (auto &i : superposition) {
         i = new unordered_multimap<size_t, Graph*>(0);
     }
     for (auto &i : new_superposition) {
         i = new unordered_multimap<size_t, Graph*>(0);
     }
-    safe_insert(nb_thread,superposition,graph_init,mutexes,master);
+    mutexes.reserve(nb_thread * 10);
+    for(int i=0; i< nb_thread*10;i++) {
+        mutexes.push_back(new mutex);
+    }
+    safe_insert(nb_thread,superposition,graph_init,mutexes);
 
     //run
-    for(int i = 0; i<15; i++) {
+    for(int i = 0; i<5; i++) {
         cout << "shift \n" ;
-        #pragma omp parallel shared(mutexes, master,new_superposition)
+        #pragma omp parallel shared(mutexes,new_superposition)
         {
             int me = omp_get_thread_num();
+            new_superposition[me]->erase(new_superposition[me]->begin(),new_superposition[me]->end());
             for (auto pair:*superposition[me]) {
-                safe_insert(nb_thread, new_superposition, pair.second->shift(), mutexes, master);
+                safe_insert(nb_thread, new_superposition, pair.second->shift(), mutexes);
             }
             #pragma omp barrier
         }
-        copy_and_delete(nb_thread,superposition,new_superposition);
+        swap(superposition,new_superposition);
         cout << "Number : " << parallel_number(nb_thread,superposition) << "\n";
         cout << "Norm : " << parallel_norm(nb_thread,superposition) << "\n";
         cout << "interaction \n";
-        #pragma omp parallel shared(mutexes, master, new_superposition)
+        #pragma omp parallel shared(mutexes, new_superposition)
         {
             int me = omp_get_thread_num();
+            new_superposition[me]->erase(new_superposition[me]->begin(),new_superposition[me]->end());
             for(auto pair:*superposition[me]) {
                 for(auto graph:pair.second->interaction(hadamard)) {
-                    safe_insert(nb_thread,new_superposition,graph,mutexes,master);
+                    safe_insert(nb_thread,new_superposition,graph,mutexes);
                 }
             }
             #pragma omp barrier
         }
-        copy_and_delete(nb_thread,superposition,new_superposition);
+        swap(superposition,new_superposition);
         cout << "Number : " << parallel_number(nb_thread,superposition) << "\n";
         cout << "Norm :" << parallel_norm(nb_thread,superposition) << "\n";
     };
     // Clean up
-    #pragma omp barrier
     for (auto &i : superposition) {
         for(auto a : *i) {
             delete a.second ;
         }
         delete i;
     }
-
-    for(auto &mutex:*mutexes) {
-        delete mutex.second;
+    for (auto &i : mutexes) {
+        delete i;
     }
-    delete mutexes;
-
-    delete master;
     return 0;
 }
 
@@ -271,7 +253,7 @@ int sequentiel() {
     typedef std::chrono::milliseconds ms;
     typedef std::chrono::duration<float> fsec;
     auto t0 = Time::now();
-    for(int i = 0; i<10626; i++) {
+    for(int i = 0; i<10; i++) {
         shift(superposition);
         cout << "shift \n" ;
         //cout << to_string(superposition) << "\n";
