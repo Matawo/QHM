@@ -143,17 +143,25 @@ void safe_insert(int nb_thread,unordered_multimap<size_t,Graph*>**superposition,
     //cout << " <" << omp_get_thread_num();
     auto range = sorted->equal_range(hash);
     bool exist = false;
-    for(auto it = range.first; it!=range.second; it++) {
+    Graph * target = graph;
+    auto it = range.first;
+    while(it != range.second) {
         if (graph->equals(it->second)) {
             it->second->setAmp(it->second->getAmp()+graph->getAmp());
             exist = true;
             //cout << graph->to_string_amp() << "     " <<it->second->to_string_amp() << "\n";
             delete graph;
+            target = it->second;
             break;
         }
+        it++;
     }
     if(not exist) {
         sorted->insert(std::pair<size_t,Graph*>(hash,graph));
+    }
+    if ( norm(target->getAmp())< error_margin) {
+        sorted->erase(it);
+        delete target;
     }
     //cout << omp_get_thread_num() << ">\n";
     m->unlock();
@@ -197,7 +205,7 @@ int open_mp() {
         #pragma omp parallel shared(mutexes,new_superposition)
         {
             int me = omp_get_thread_num();
-            new_superposition[me]->erase(new_superposition[me]->begin(),new_superposition[me]->end());
+            new_superposition[me]->clear();
             for (auto pair:*superposition[me]) {
                 safe_insert(nb_thread, new_superposition, pair.second->shift(), mutexes);
             }
@@ -210,7 +218,7 @@ int open_mp() {
         #pragma omp parallel shared(mutexes, new_superposition)
         {
             int me = omp_get_thread_num();
-            new_superposition[me]->erase(new_superposition[me]->begin(),new_superposition[me]->end());
+            new_superposition[me]->clear();
             for(auto pair:*superposition[me]) {
                 for(auto graph:pair.second->interaction(hadamard)) {
                     safe_insert(nb_thread,new_superposition,graph,mutexes);
@@ -219,11 +227,20 @@ int open_mp() {
             #pragma omp barrier
         }
         swap(superposition,new_superposition);
+        for (auto &section : new_superposition) {
+            section->erase(section->begin(), section->end());
+        }
         cout << "Number : " << parallel_number(nb_thread,superposition) << "\n";
         cout << "Norm :" << parallel_norm(nb_thread,superposition) << "\n";
     };
     // Clean up
     for (auto &i : superposition) {
+        for(auto a : *i) {
+            delete a.second ;
+        }
+        delete i;
+    }
+    for (auto &i : new_superposition) {
         for(auto a : *i) {
             delete a.second ;
         }
@@ -257,7 +274,7 @@ int sequentiel() {
         shift(superposition);
         cout << "shift \n" ;
         //cout << to_string(superposition) << "\n";
-        cout << "Norm :" << calculate_norm(superposition) << "\n";
+        cout << "Norm :" << calculate_norm(superposition) << " " << superposition.size()<< "\n";
         interaction(superposition, hadamard);
         cout << "interaction \n";
         //cout << to_string(superposition) << "\n";

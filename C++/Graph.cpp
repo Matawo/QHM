@@ -212,7 +212,7 @@ bool Graph::operator<(const Graph &rhs) const {
     if (rhs.particles < particles)
         return false;
     for(int i= 0; i<size; i++) {
-        cout << i <<"\n";
+        //cout << i <<"\n";
         if(&names[i]<&rhs.names[i]) {
             return true;
         }

@@ -152,7 +152,7 @@ bool Name::operator==(Name* other){
 }
 
 bool Name::operator<(Name *rhs) {
-    cout << to_string() <<" vs"<< rhs->to_string() << " \n";
+    //cout << to_string() <<" vs"<< rhs->to_string() << " \n";
     auto left = dynamic_cast<SimpleName*>(this);
     auto right = dynamic_cast<SimpleName*>(rhs);
     if(left != nullptr and right != nullptr) {
